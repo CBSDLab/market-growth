@@ -1,6 +1,5 @@
-# market-growth
-Forrester's market growth model 
-
+# Forrester's Market Growth Model
+Forrester's (1968) market growth model is a classic system dynamics model of increasing sales through marketing and failing to make the capital investments to keep up with demand creating an overshoot and collapse scenario in an hypothetical market with infinite demand. Figure 1 shows the basic loop structure. 
 
 <img width="604" alt="image" src="https://github.com/user-attachments/assets/8bc6e177-29a1-4b7b-860f-5956d2b05151">
 
