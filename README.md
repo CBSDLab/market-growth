@@ -7,7 +7,7 @@ Figure 1. Loop structure of market growth and capital underinvestment structure 
 
 # Getting Started
 
-You can either clone the directory if you have Git installed on your computer or simply download the repository as a zip file by clicking 
+You can either clone the directory if you have Git installed on your computer or simply download the repository as a zip file by clicking this [link](https://github.com/CBSDLab/market-growth/archive/refs/heads/main.zip) to download a zipped file of the repository. 
 
 # References
 Forrester, J. W. (1968). Market growth as influenced by capital investment. *Industrial Management Review, 9*, 83-105. 
