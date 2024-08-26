@@ -1,0 +1,876 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xmile version="1.0" xmlns="http://docs.oasis-open.org/xmile/ns/XMILE/v1.0" xmlns:isee="http://iseesystems.com/XMILE">
+	<header>
+		<smile version="1.0" namespace="std, isee"/>
+		<name>Forrester Market Growth Model</name>
+		<uuid>b1a4ee78-923f-478d-b6cb-6f3759a1de22</uuid>
+		<vendor>isee systems, inc.</vendor>
+		<product version="3.7.1" isee:build_number="3377" isee:saved_by_v1="true" lang="en">Stella Architect</product>
+	</header>
+	<sim_specs isee:sim_duration="1.5" isee:run_prefix="Run" isee:simulation_delay="0.015" isee:restore_on_start="false" method="Euler" time_units="Months" isee:instantaneous_flows="false" isee:ignore_module_errors="false" isee:strict_units="true" isee:loop_scores="true" isee:loop_exhaustive_allowed="1000">
+		<start>0</start>
+		<stop>100</stop>
+		<dt reciprocal="true">2</dt>
+	</sim_specs>
+	<isee:prefs saved_runs="5" keep="false" show_module_prefix="true" live_update_on_drag="true" show_restore_buttons="false" layer="model" isee:design="Deluxe Prev-Next Blue Green Pastel" isee:design_custom="false" interface_scale_ui="true" interface_max_page_width="10000" interface_max_page_height="10000" interface_min_page_width="0" interface_min_page_height="0" rerun_on_structure_change="false" rifp="true"/>
+	<isee:multiplayer_settings include_chat="true" allow_observers="false" advance_time_increment="1" max_advance_time_in_ms="0" model_stops_when_players_drop="false" observer_start_page="home_page" enabled="false"/>
+	<isee:time_formats default_format="Builtin">
+		<isee:time_format name="Builtin" type="adaptive"/>
+	</isee:time_formats>
+	<isee:number_format_extenders/>
+	<default_format/>
+	<data>
+		<import frequency="on_demand" isee:overwrite="false" orientation="horizontal" resource="r../Scenarios.xlsx" type="Excel" worksheet="Baseline"/>
+	</data>
+	<model_units>
+		<unit name="Dimensionless">
+			<eqn>1</eqn>
+			<alias>dmnl</alias>
+			<alias>unitless</alias>
+			<alias>fraction</alias>
+		</unit>
+		<unit name="People">
+			<eqn/>
+			<alias>person</alias>
+			<alias>persons</alias>
+		</unit>
+		<unit name="Widgets">
+			<eqn/>
+			<alias>widget</alias>
+		</unit>
+		<unit name="$">
+			<eqn/>
+			<alias>dollar</alias>
+			<alias>dollars</alias>
+		</unit>
+		<unit name="Months">
+			<eqn/>
+			<alias>mo</alias>
+			<alias>month</alias>
+		</unit>
+	</model_units>
+	<model>
+		<variables>
+			<stock name="Salesmen S1">
+				<eqn>10</eqn>
+				<inflow>Salesmen_Hired_SH6</inflow>
+				<units>People</units>
+			</stock>
+			<flow name="Salesmen\nHired SH6">
+				<eqn>(Indicated_Salesmen_IS5-Salesmen_S1)/Salesman_Adjustment_Time_SAT</eqn>
+				<units>People/Months</units>
+			</flow>
+			<aux name="Salesman\nConstant SCT">
+				<eqn>60</eqn>
+				<units>People</units>
+			</aux>
+			<aux name="SW1">
+				<eqn>0</eqn>
+				<format precision="1"/>
+				<range min="0" max="1"/>
+				<units>unitless</units>
+			</aux>
+			<aux name="Salesman\nSwitch SSW2">
+				<eqn>IF SW1 = 0 THEN Salesman_Constant_SCT ELSE Salesmen_S1</eqn>
+				<units>People</units>
+			</aux>
+			<stock name="Backlog BL7">
+				<eqn>8000</eqn>
+				<inflow>Orders_Booked_OB3</inflow>
+				<outflow>Delivery_Rate_DR10</outflow>
+				<units>Widgets</units>
+			</stock>
+			<flow name="Orders\nBooked OB3">
+				<eqn>Salesman_Switch_SSW2*Sales_Effectiveness_SE18</eqn>
+				<units>Widgets/Months</units>
+			</flow>
+			<aux name="Sales\nEffectiveness SE18">
+				<eqn>Sales_Effectiveness_from_Delay_SW_SEDS*Sales_Effectiveness_Maximum_SEM</eqn>
+				<units>Widgets/People/Month</units>
+			</aux>
+			<flow name="Delivery\nRate DR10">
+				<eqn>Production_Capacity_PC27*Production_Capacity_Fraction_PCF9</eqn>
+				<units>Widgets/Months</units>
+			</flow>
+			<aux name="Salesman\nAdjustment Time SAT">
+				<eqn>20</eqn>
+				<units>Months</units>
+			</aux>
+			<aux name="Indicated\nSalesmen IS5">
+				<eqn>Budget_B4/Salesman_Salary_SS</eqn>
+				<units>People</units>
+			</aux>
+			<aux name="Salesman\nSalary SS">
+				<eqn>2000</eqn>
+				<units>Dollars/People/Month</units>
+			</aux>
+			<stock name="Delivery Rate\nAverage DRA11">
+				<eqn>Delivery_Rate_DR10</eqn>
+				<inflow>adjusting_DRA</inflow>
+				<units>Widgets/Months</units>
+			</stock>
+			<flow name="adjusting DRA">
+				<eqn>(Delivery_Rate_DR10-Delivery_Rate_Average_DRA11)/Delivery_Rate_Adjustment_Time_DRAT</eqn>
+				<units>Widgets/Months/Months</units>
+			</flow>
+			<aux name="Delivery Rate\nAdjustment Time DRAT">
+				<eqn>1</eqn>
+				<units>Month</units>
+			</aux>
+			<aux name="Budget B4">
+				<eqn>Delivery_Rate_Average_DRA11*Revenue_to_Sales_RS</eqn>
+				<units>Dollars/Month</units>
+			</aux>
+			<aux name="Revenue\nto Sales RS">
+				<eqn>12</eqn>
+				<units>Dollars/Widgets</units>
+			</aux>
+			<stock name="Production\nCapacity PC27">
+				<eqn>Production_Capacity_Initial_PCI</eqn>
+				<inflow>Production_Capacity_Receiving_PCR25</inflow>
+				<units>Widgets/Months</units>
+			</stock>
+			<stock name="Production\nCapacity\nOn Order PCOO26">
+				<eqn>Production_Capacity_Ordering_PCO24*Production_Capacity_Receiving_Delay_PCRD</eqn>
+				<inflow>Production_Capacity_Ordering_PCO24</inflow>
+				<outflow>Production_Capacity_Receiving_PCR25</outflow>
+				<units>Widgets/Months</units>
+			</stock>
+			<flow name="Production\nCapacity\nReceiving PCR25">
+				<eqn>DELAY3(Production_Capacity_Ordering_PCO24,  Production_Capacity_Receiving_Delay_PCRD,  Production_Capacity_Ordering_PCO24)</eqn>
+				<units>Widgets/Months/Months</units>
+			</flow>
+			<flow name="Production\nCapacity\nOrdering PCO24">
+				<eqn>Production_Capacity_PC27*CEFSW23</eqn>
+				<units>Widgets/Months/Months</units>
+			</flow>
+			<aux name="Production\nCapacity Initial PCI">
+				<eqn>12000</eqn>
+				<units>Widgets/Months</units>
+			</aux>
+			<aux name="Production\nCapacity\nReceiving Delay PCRD">
+				<eqn>12</eqn>
+				<units>Months</units>
+			</aux>
+			<aux name="CEFSW23">
+				<eqn>IF SW3 = 0 THEN 0 ELSE Capacity_Expansion_Fraction</eqn>
+				<units>1/Months</units>
+			</aux>
+			<aux name="SW3">
+				<eqn>0</eqn>
+				<format precision="1"/>
+				<range min="0" max="1"/>
+				<units>unitless</units>
+			</aux>
+			<aux name="Capacity\nExpansion\nFraction">
+				<eqn>Delivery_Delay_Condition_DDC21</eqn>
+				<gf>
+					<xscale min="0" max="2.5"/>
+					<yscale min="-0.1" max="0.2"/>
+					<ypts>-0.07,-0.02,0,0.02,0.07,0.15</ypts>
+				</gf>
+				<units>1/Months</units>
+			</aux>
+			<aux name="Delivery\nDelay Bias DDB">
+				<eqn>0.3</eqn>
+				<units>Unitless</units>
+			</aux>
+			<aux name="Delivery\nDelay\nCondition DDC21">
+				<eqn>(Delivery_Delay_Recognized_by_Company_DDRC13/Delivery_Delay_Operating_Goal_DDOG20)-Delivery_Delay_Bias_DDB</eqn>
+				<units>Unitless</units>
+			</aux>
+			<aux name="Delivery Delay\nOperating Goal DDOG20">
+				<eqn>Delivery_Delay_Taditional_DDT19*Delivery_Delay_Weighting_DDW+Delivery_Delay_Management_Goal_DDMG*Delivery_Delay_Weighting_Compliment_DDWC</eqn>
+				<units>Months</units>
+			</aux>
+			<aux name="Delivery Delay\nWeighting DDW">
+				<eqn>0</eqn>
+				<units>Unitless</units>
+			</aux>
+			<aux name="Delivery Delay\nWeighting Compliment\nDDWC">
+				<eqn>1-Delivery_Delay_Weighting_DDW</eqn>
+				<units>Unitless</units>
+			</aux>
+			<stock name="Delivery Delay\nRecognized by Company\nDDRC13">
+				<eqn>Delivery_Delay_Indicated_DDI12</eqn>
+				<inflow>increasing_company_delivery_delay</inflow>
+				<outflow>reducing_company_delivery_delay</outflow>
+				<units>Months</units>
+			</stock>
+			<stock name="Delivery Delay\nRecognized by Market\nDDRM14">
+				<eqn>Delivery_Delay_Recognized_by_Company_DDRC13</eqn>
+				<inflow>increasing_market_delivery_delay</inflow>
+				<outflow>decreasing_market_delivery_delay</outflow>
+				<units>Months</units>
+			</stock>
+			<flow name="reducing\ncompany\ndelivery delay">
+				<eqn>Delivery_Delay_Recognized_by_Company_DDRC13/Time_for_Delivery_Delay_Recognition_by_Company_TDDRC</eqn>
+				<units>Unitless</units>
+			</flow>
+			<aux name="Time for Delivery Delay\nRecognition by Company\nTDDRC">
+				<eqn>4</eqn>
+				<units>Months</units>
+			</aux>
+			<flow name="increasing\ncompany\ndelivery delay">
+				<eqn>Delivery_Delay_Indicated_DDI12/Time_for_Delivery_Delay_Recognition_by_Company_TDDRC</eqn>
+				<units>Unitless</units>
+			</flow>
+			<aux name="Time for Delivery Delay\nRecognition by Market\nTDDRM">
+				<eqn>6</eqn>
+				<units>Months</units>
+			</aux>
+			<aux name="Delivery Delay\nIndicated DDI12">
+				<eqn>Backlog_BL7/Delivery_Rate_Average_DRA11</eqn>
+				<units>Months</units>
+			</aux>
+			<flow name="decreasing\nmarket\ndelivery delay">
+				<eqn>Delivery_Delay_Recognized_by_Market_DDRM14/Time_for_Delivery_Delay_Recognition_by_Market_TDDRM</eqn>
+				<units>Unitless</units>
+			</flow>
+			<aux name="Delivery Delay\nMinimum DDM8">
+				<eqn>Backlog_BL7/Production_Capacity_PC27</eqn>
+				<units>Months</units>
+			</aux>
+			<aux name="Production Capacity\nFraction PCF9">
+				<eqn>Delivery_Delay_Minimum_DDM8</eqn>
+				<gf>
+					<xscale min="0" max="5"/>
+					<yscale min="0" max="1"/>
+					<ypts>0,0.25,0.5,0.67,0.8,0.87,0.93,0.95,0.97,0.98,1</ypts>
+				</gf>
+				<units>Unitless</units>
+			</aux>
+			<stock name="Delivery Delay\nTaditional DDT19">
+				<eqn>Delivery_Delay_Recognized_by_Company_DDRC13</eqn>
+				<inflow>increasing_traditional_delivery_delay</inflow>
+				<outflow>decreasing_traditional_delivery_delay</outflow>
+				<units>Months</units>
+			</stock>
+			<flow name="increasing\nmarket\ndelivery delay">
+				<eqn>Delivery_Delay_Recognized_by_Company_DDRC13/Time_for_Delivery_Delay_Recognition_by_Market_TDDRM</eqn>
+				<units>Unitless</units>
+			</flow>
+			<aux name="Time for Delivery Delay\nTraditional TDDT">
+				<eqn>12</eqn>
+				<units>Months</units>
+			</aux>
+			<flow name="decreasing\ntraditional\ndelivery delay">
+				<eqn>Delivery_Delay_Taditional_DDT19/Time_for_Delivery_Delay_Traditional_TDDT</eqn>
+				<units>Unitless</units>
+			</flow>
+			<flow name="increasing\ntraditional\ndelivery delay">
+				<eqn>Delivery_Delay_Recognized_by_Company_DDRC13/Time_for_Delivery_Delay_Traditional_TDDT</eqn>
+				<units>Unitless</units>
+			</flow>
+			<aux name="Delivery Delay\nManagement Goal\nDDMG">
+				<eqn>2</eqn>
+				<units>Months</units>
+			</aux>
+			<aux name="SW2">
+				<eqn>0</eqn>
+				<format precision="1"/>
+				<range min="0" max="1"/>
+				<units>unitless</units>
+			</aux>
+			<aux name="Sales Effectiveness\nfrom Delay SW\nSEDS">
+				<eqn>IF SW2 = 0
+THEN Sales_Effectiveness_from_Delay_CLIP_SEDC16
+ELSE Sales_Effectiveness_from_Delay_Multiplier_SEDM15</eqn>
+				<units>Widgets/People/Month</units>
+			</aux>
+			<aux name="Sales Effectiveness\nfrom Delay\nMultiplier SEDM15">
+				<eqn>Delivery_Delay_Recognized_by_Market_DDRM14</eqn>
+				<gf>
+					<xscale min="0" max="10"/>
+					<yscale min="0" max="1"/>
+					<ypts>1,0.97,0.87,0.73,0.53,0.38,0.25,0.15,0.08,0.03,0.02</ypts>
+				</gf>
+				<units>Widgets/People/Month</units>
+			</aux>
+			<aux name="Sales Effectiveness\nfrom Delay CLIP\nSEDC16">
+				<eqn>IF TIME &gt;= Sales_Effectiveness_from_Delay_Clip_Time_SEDCT
+THEN Sales_Effectiveness_from_Delay_Final_SEDF
+ELSE Sales_Effectiveness_from_Delay_Initial_SEDI</eqn>
+				<units>Widgets/People/Month</units>
+			</aux>
+			<aux name="Sales Effectiveness\nfrom Delay Initial\nSEDI">
+				<eqn>1</eqn>
+				<units>Widgets/People/Month</units>
+			</aux>
+			<aux name="Sales Effectiveness\nfrom Delay Final\nSEDF">
+				<eqn>1</eqn>
+				<units>Widgets/People/Month</units>
+			</aux>
+			<aux name="Sales Effectiveness\nfrom Delay Clip Time\nSEDCT">
+				<eqn>36</eqn>
+				<units>Months</units>
+			</aux>
+			<aux name="Sales\nEffectiveness\nMaximum SEM">
+				<eqn>400</eqn>
+				<units>unitless</units>
+			</aux>
+		</variables>
+		<views>
+			<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+				<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:loop_indicator color="black" background="white" vertical_text_align="top" font_size="12pt"/>
+				<numeric_display color="white" background="white" font_size="12pt" border_width="thin" border_style="solid" isee:transparent="false" isee:show_divider="true" isee:show_bounding_box="true" label_side="left"/>
+				<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+					<isee:series_styles>
+						<isee:series_style color="blue" thickness="1"/>
+						<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF7F00" thickness="1"/>
+						<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#FF007F" thickness="1"/>
+						<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+						<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+						<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+						<isee:series_style color="#C8C8C8" thickness="1"/>
+					</isee:series_styles>
+				</graph>
+				<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="ending" report_flows="summed" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				<button color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595"/>
+				<isee:annotation color="black" background="#E0E0E0" font_size="12pt" border_width="thin" border_style="solid" transparent="false" corner_radius="0" isee:flat="false" icon_side="top" isee:highlight_on_hover="false" isee:highlight_color="#959595" popup_corner_radius="0" popup_background_color="#FFFECF"/>
+				<slider color="#66CC66" background="#E0E0E0" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" vertical="false" isee:fancy_appearance="false" isee:show_hover_tip="when_deciding" input_expands="true" input_width="100"/>
+				<isee:stacked_container color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" padding="6 8" border_color="#999999" border_width="thin" border_style="solid" item_spacing="0" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD" transparent_bg="false"/>
+				<isee:dual_slider color="#66CC66" background="silver" font_size="12pt" num_ticks="3" label_side="top" wrap_title="true" isee:show_hover_tip="when_deciding" input_expands="true" input_width="100"/>
+				<isee:sim_speed_slider color="black" background="white"/>
+				<isee:time_slider color="#E95F74" background="silver"/>
+				<isee:pie_input color="black" background="white" font_size="12pt" legend_position="bottom" isee:transparent="false"/>
+				<knob color="#66CC66" background="#E0E0E0" font_size="12pt" label_side="bottom" wrap_title="true"/>
+				<numeric_input color="black" background="#E0E0E0" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<isee:dropdown_input color="black" background="#E0E0E0" font_size="12pt" label_side="left" wrap_title="true" input_expands="false" input_width="100"/>
+				<switch color="black" background="#E0E0E0" font_size="12pt" label_side="top" wrap_title="true" isee:appearance="switch" isee:on_color="green"/>
+				<options color="black" background="white" appearance="radio-buttons" arrangement="vertical"/>
+				<graphical_input color="black" background="#E0E0E0" font_size="12pt" isee:show_hover_tip="true"/>
+				<group_input color="black" background="#E0E0E0" font_size="12pt"/>
+				<lamp color="black" background="white" font_size="9pt"/>
+				<gauge color="black" background="white" font_size="9pt" needle_color="#F09F72" bar_color="#EEEEEE" bar_progress_color="black" appearance="radial" num_major_ticks="11" num_minor_ticks="1" show_numeric_value="true"/>
+				<isee:spatial_map color="black" background="white" font_size="12pt"/>
+				<isee:animation_object color="black" background="white" font_size="12pt"/>
+				<isee:navigation_widget color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" padding="6 8" border_color="#999999" border_width="thin" border_style="solid" item_spacing="6" appearance="tabs" corner_radius="4" selected_item_color="black" selected_item_background="white" item_background="#DDDDDD" transparent_bg="false"/>
+				<isee:shape color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid" opacity="1" transparent_background="true" corner_radius="1"/>
+				<isee:selector color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+				<isee:iframe color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid"/>
+				<isee:financial_table color="black" background="#E0E0E0" text_align="right" font_size="12pt" hide_border="false" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+			</style>
+			<view isee:show_pages="false" background="white" page_width="742" page_height="594" isee:page_cols="4" isee:page_rows="6" isee:popup_graphs_are_comparative="true" isee:enable_non_negative_highlights="false" type="stock_flow">
+				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
+					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="45" height="35"/>
+					</stock>
+					<flow color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</flow>
+					<isee:placeholder color="#228B22" background="white" font_color="#228B22" font_size="9pt" label_side="bottom"/>
+					<module color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
+						<shape type="rectangle" width="55" height="45"/>
+					</module>
+					<aux color="blue" background="white" font_color="blue" font_size="9pt" label_side="bottom">
+						<shape type="circle" radius="18"/>
+					</aux>
+					<group color="red" background="white" font_color="red" font_size="9pt"/>
+					<connector color="#FF007F" background="white" font_color="#FF007F" font_size="9pt" isee:thickness="1"/>
+					<text_box color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt"/>
+					<isee:loop_indicator color="black" background="white" vertical_text_align="top" font_size="12pt"/>
+					<numeric_display color="white" background="white" font_size="12pt" border_width="thin" border_style="solid" isee:transparent="false" isee:show_divider="true" isee:show_bounding_box="true" label_side="left"/>
+					<graph color="black" background="white" font_size="12pt" axis_color="#666666" grid_color="#C8C8C8" isee:graph_area_color="white" legend_position="bottom" isee:transparent="false" isee:hide_border="false" axis_title_font_style="normal" axis_title_font_weight="normal" axis_title_text_decoration="none" axis_title_text_align="center" axis_title_vertical_text_align="center" axis_title_font_color="black" axis_title_font_family="Arial" axis_title_font_size="12pt" axis_title_text_padding="2" axis_title_text_border_color="black" axis_title_text_border_width="thin" axis_title_text_border_style="none" axis_label_font_style="normal" axis_label_font_weight="normal" axis_label_text_decoration="none" axis_label_text_align="center" axis_label_vertical_text_align="center" axis_label_font_color="black" axis_label_font_family="Arial" axis_label_font_size="9pt" axis_label_text_padding="2" axis_label_text_border_color="black" axis_label_text_border_width="thin" axis_label_text_border_style="none">
+						<isee:series_styles>
+							<isee:series_style color="blue" thickness="1"/>
+							<isee:series_style color="red" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="fuchsia" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="#008F44" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF7F00" thickness="1"/>
+							<isee:series_style color="#7F00FF" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#0CA0FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="lime" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#FF007F" thickness="1"/>
+							<isee:series_style color="aqua" thickness="1" pen_style="dot_dashed"/>
+							<isee:series_style color="#F586FF" thickness="1" pen_style="dotted"/>
+							<isee:series_style color="black" thickness="1" pen_style="dashed"/>
+							<isee:series_style color="#C8C8C8" thickness="1"/>
+						</isee:series_styles>
+					</graph>
+					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="ending" report_flows="summed" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
+				</style>
+				<stock x="345" y="525" name="Salesmen S1"/>
+				<flow x="257.75" y="525" name="Salesmen\nHired SH6">
+					<pts>
+						<pt x="181" y="525"/>
+						<pt x="322.5" y="525"/>
+					</pts>
+				</flow>
+				<aux label_side="left" x="345" y="457" name="Salesman\nConstant SCT"/>
+				<aux color="#008F00" font_color="#008F00" label_side="left" x="345" y="419" name="SW1"/>
+				<aux label_side="right" label_angle="45" x="437" y="525" name="Salesman\nSwitch SSW2"/>
+				<connector uid="1" angle="0">
+					<from>Salesmen_S1</from>
+					<to>Salesman_Switch_SSW2</to>
+				</connector>
+				<connector uid="2" angle="5.71059">
+					<from>Salesman_Constant_SCT</from>
+					<to>Salesman_Switch_SSW2</to>
+				</connector>
+				<connector uid="3" angle="341.565">
+					<from>SW1</from>
+					<to>Salesman_Switch_SSW2</to>
+				</connector>
+				<stock x="576" y="641" name="Backlog BL7"/>
+				<flow x="491.75" y="641" name="Orders\nBooked OB3">
+					<pts>
+						<pt x="418" y="641"/>
+						<pt x="553.5" y="641"/>
+					</pts>
+				</flow>
+				<connector uid="4" angle="317.643">
+					<from>Salesman_Switch_SSW2</from>
+					<to>Orders_Booked_OB3</to>
+				</connector>
+				<aux label_side="right" x="576" y="522" name="Sales\nEffectiveness SE18"/>
+				<connector uid="5" angle="254.055">
+					<from>Sales_Effectiveness_SE18</from>
+					<to>Orders_Booked_OB3</to>
+				</connector>
+				<flow x="658.75" y="642" name="Delivery\nRate DR10">
+					<pts>
+						<pt x="598.5" y="642"/>
+						<pt x="731" y="642"/>
+					</pts>
+				</flow>
+				<aux label_side="top" x="198" y="453" name="Salesman\nAdjustment Time SAT"/>
+				<connector uid="6" angle="141.789">
+					<from>Salesmen_S1</from>
+					<to>Salesmen_Hired_SH6</to>
+				</connector>
+				<connector uid="7" angle="347.471">
+					<from>Salesman_Adjustment_Time_SAT</from>
+					<to>Salesmen_Hired_SH6</to>
+				</connector>
+				<aux label_side="left" x="236" y="664" name="Indicated\nSalesmen IS5"/>
+				<connector uid="8" angle="133.091">
+					<from>Indicated_Salesmen_IS5</from>
+					<to>Salesmen_Hired_SH6</to>
+				</connector>
+				<aux x="180" y="736" name="Salesman\nSalary SS"/>
+				<connector uid="9" angle="18.4349">
+					<from>Salesman_Salary_SS</from>
+					<to>Indicated_Salesmen_IS5</to>
+				</connector>
+				<stock x="576" y="747" name="Delivery Rate\nAverage DRA11"/>
+				<flow x="663.75" y="747" name="adjusting DRA">
+					<pts>
+						<pt x="741" y="747"/>
+						<pt x="598.5" y="747"/>
+					</pts>
+				</flow>
+				<connector uid="10" angle="336.801">
+					<from>Delivery_Rate_Average_DRA11</from>
+					<to>adjusting_DRA</to>
+				</connector>
+				<connector uid="11" angle="211.608">
+					<from>Delivery_Rate_DR10</from>
+					<to>adjusting_DRA</to>
+				</connector>
+				<aux label_side="right" x="710" y="720.5" name="Delivery Rate\nAdjustment Time DRAT"/>
+				<connector uid="12" angle="191.31">
+					<from>Delivery_Rate_Adjustment_Time_DRAT</from>
+					<to>adjusting_DRA</to>
+				</connector>
+				<aux x="372" y="747" name="Budget B4"/>
+				<aux color="#008F00" font_color="#008F00" label_side="left" x="372" y="672" name="Revenue\nto Sales RS"/>
+				<connector uid="13" angle="192.011">
+					<from>Delivery_Rate_Average_DRA11</from>
+					<to>Budget_B4</to>
+				</connector>
+				<connector uid="14" angle="318.366">
+					<from>Revenue_to_Sales_RS</from>
+					<to>Budget_B4</to>
+				</connector>
+				<connector uid="15" angle="173.089">
+					<from>Budget_B4</from>
+					<to>Indicated_Salesmen_IS5</to>
+				</connector>
+				<stock label_side="right" x="944" y="267" name="Production\nCapacity PC27"/>
+				<stock x="770" y="267" name="Production\nCapacity\nOn Order PCOO26"/>
+				<flow x="857" y="267" name="Production\nCapacity\nReceiving PCR25">
+					<pts>
+						<pt x="792.5" y="267"/>
+						<pt x="921.5" y="267"/>
+					</pts>
+				</flow>
+				<flow x="677.25" y="267" name="Production\nCapacity\nOrdering PCO24">
+					<pts>
+						<pt x="595" y="267"/>
+						<pt x="747.5" y="267"/>
+					</pts>
+				</flow>
+				<aux color="#008F00" font_color="#008F00" label_side="right" x="944" y="226" name="Production\nCapacity Initial PCI"/>
+				<aux label_side="bottom" x="783.5" y="329" name="Production\nCapacity\nReceiving Delay PCRD"/>
+				<connector uid="16" angle="53.1301">
+					<from>Production_Capacity_Receiving_Delay_PCRD</from>
+					<to>Production_Capacity_Receiving_PCR25</to>
+				</connector>
+				<connector uid="18" angle="125.218">
+					<from>Production_Capacity_PC27</from>
+					<to>Production_Capacity_Ordering_PCO24</to>
+				</connector>
+				<aux label_side="left" x="677.25" y="153" name="CEFSW23"/>
+				<connector uid="19" angle="222.709">
+					<from>CEFSW23</from>
+					<to>Production_Capacity_Ordering_PCO24</to>
+				</connector>
+				<aux color="#008F00" font_color="#008F00" label_side="top" x="677.25" y="107" name="SW3"/>
+				<connector uid="20" angle="270">
+					<from>SW3</from>
+					<to>CEFSW23</to>
+				</connector>
+				<aux label_side="top" x="1101" y="165" name="Capacity\nExpansion\nFraction"/>
+				<aux label_side="bottom" x="1318.75" y="165" name="Delivery\nDelay Bias DDB"/>
+				<aux label_side="top" x="1220.75" y="165" name="Delivery\nDelay\nCondition DDC21"/>
+				<connector uid="21" angle="161.075">
+					<from>Delivery_Delay_Condition_DDC21</from>
+					<to>Capacity_Expansion_Fraction</to>
+				</connector>
+				<connector uid="22" angle="165.069">
+					<from>Capacity_Expansion_Fraction</from>
+					<to>CEFSW23</to>
+				</connector>
+				<connector uid="23" angle="180">
+					<from>Delivery_Delay_Bias_DDB</from>
+					<to>Delivery_Delay_Condition_DDC21</to>
+				</connector>
+				<aux label_side="left" x="1293.75" y="256" name="Delivery Delay\nOperating Goal DDOG20"/>
+				<connector uid="25" angle="111.448">
+					<from>Delivery_Delay_Operating_Goal_DDOG20</from>
+					<to>Delivery_Delay_Condition_DDC21</to>
+				</connector>
+				<aux color="#008F00" font_color="#008F00" label_side="left" x="1455" y="171" name="Delivery Delay\nWeighting DDW"/>
+				<aux label_side="right" x="1455" y="226" name="Delivery Delay\nWeighting Compliment\nDDWC"/>
+				<connector uid="26" angle="293.199">
+					<from>Delivery_Delay_Weighting_DDW</from>
+					<to>Delivery_Delay_Weighting_Compliment_DDWC</to>
+				</connector>
+				<connector uid="27" angle="233.13">
+					<from>Delivery_Delay_Weighting_DDW</from>
+					<to>Delivery_Delay_Operating_Goal_DDOG20</to>
+				</connector>
+				<connector uid="28" angle="201.038">
+					<from>Delivery_Delay_Weighting_Compliment_DDWC</from>
+					<to>Delivery_Delay_Operating_Goal_DDOG20</to>
+				</connector>
+				<connector uid="29" angle="212.829">
+					<from>Backlog_BL7</from>
+					<to>Delivery_Delay_Indicated_DDI12</to>
+				</connector>
+				<connector uid="30" angle="303.024">
+					<from>Delivery_Rate_Average_DRA11</from>
+					<to>Delivery_Delay_Indicated_DDI12</to>
+				</connector>
+				<stock x="867" y="897" name="Delivery Delay\nRecognized by Company\nDDRC13"/>
+				<stock x="418" y="1020" name="Delivery Delay\nRecognized by Market\nDDRM14"/>
+				<flow x="932.75" y="894" name="reducing\ncompany\ndelivery delay">
+					<pts>
+						<pt x="889.5" y="894"/>
+						<pt x="988" y="894"/>
+					</pts>
+				</flow>
+				<aux x="867" y="965" name="Time for Delivery Delay\nRecognition by Company\nTDDRC"/>
+				<connector uid="31" angle="111.801">
+					<from>Time_for_Delivery_Delay_Recognition_by_Company_TDDRC</from>
+					<to>increasing_company_delivery_delay</to>
+				</connector>
+				<flow x="797.75" y="894" name="increasing\ncompany\ndelivery delay">
+					<pts>
+						<pt x="739" y="894"/>
+						<pt x="844.5" y="894"/>
+					</pts>
+				</flow>
+				<aux label_side="top" x="418" y="936" name="Time for Delivery Delay\nRecognition by Market\nTDDRM"/>
+				<connector uid="34" angle="28.4429">
+					<from>Delivery_Delay_Recognized_by_Company_DDRC13</from>
+					<to>reducing_company_delivery_delay</to>
+				</connector>
+				<aux label_side="bottom" x="567" y="839.5" name="Delivery Delay\nIndicated DDI12"/>
+				<connector uid="35" angle="17.6501">
+					<from>Delivery_Delay_Indicated_DDI12</from>
+					<to>increasing_company_delivery_delay</to>
+				</connector>
+				<flow x="493.75" y="1021" name="decreasing\nmarket\ndelivery delay">
+					<pts>
+						<pt x="440.5" y="1021"/>
+						<pt x="559" y="1021"/>
+					</pts>
+				</flow>
+				<connector uid="36" angle="42.5104">
+					<from>Delivery_Delay_Recognized_by_Market_DDRM14</from>
+					<to>decreasing_market_delivery_delay</to>
+				</connector>
+				<connector uid="37" angle="0">
+					<from>Time_for_Delivery_Delay_Recognition_by_Market_TDDRM</from>
+					<to>decreasing_market_delivery_delay</to>
+				</connector>
+				<aux label_side="left" x="801.5" y="475" name="Delivery Delay\nMinimum DDM8"/>
+				<connector uid="38" angle="19.7989">
+					<from>Backlog_BL7</from>
+					<to>Delivery_Delay_Minimum_DDM8</to>
+				</connector>
+				<connector uid="39" angle="244.537">
+					<from>Production_Capacity_PC27</from>
+					<to>Delivery_Delay_Minimum_DDM8</to>
+				</connector>
+				<connector uid="40" angle="303.69">
+					<from>Production_Capacity_PC27</from>
+					<to>Delivery_Rate_DR10</to>
+				</connector>
+				<aux label_side="right" x="828" y="562" name="Production Capacity\nFraction PCF9"/>
+				<connector uid="41" angle="309.806">
+					<from>Delivery_Delay_Minimum_DDM8</from>
+					<to>Production_Capacity_Fraction_PCF9</to>
+				</connector>
+				<connector uid="42" angle="217.569">
+					<from>Production_Capacity_Fraction_PCF9</from>
+					<to>Delivery_Rate_DR10</to>
+				</connector>
+				<stock x="1238" y="536" name="Delivery Delay\nTaditional DDT19"/>
+				<flow x="346.75" y="1019" name="increasing\nmarket\ndelivery delay">
+					<pts>
+						<pt x="286" y="1019"/>
+						<pt x="395.5" y="1019"/>
+					</pts>
+				</flow>
+				<connector uid="43" angle="68.4986">
+					<from>Time_for_Delivery_Delay_Recognition_by_Company_TDDRC</from>
+					<to>reducing_company_delivery_delay</to>
+				</connector>
+				<connector uid="44" angle="184.899">
+					<from>Time_for_Delivery_Delay_Recognition_by_Market_TDDRM</from>
+					<to>increasing_market_delivery_delay</to>
+				</connector>
+				<connector uid="45" angle="244.537">
+					<from>Delivery_Delay_Recognized_by_Company_DDRC13</from>
+					<to>increasing_market_delivery_delay</to>
+				</connector>
+				<aux x="1238" y="601" name="Time for Delivery Delay\nTraditional TDDT"/>
+				<flow x="1314.75" y="534" name="decreasing\ntraditional\ndelivery delay">
+					<pts>
+						<pt x="1260.5" y="534"/>
+						<pt x="1381" y="534"/>
+					</pts>
+				</flow>
+				<flow x="1155.75" y="536" name="increasing\ntraditional\ndelivery delay">
+					<pts>
+						<pt x="1084" y="536"/>
+						<pt x="1215.5" y="536"/>
+					</pts>
+				</flow>
+				<connector uid="46" angle="123.69">
+					<from>Time_for_Delivery_Delay_Traditional_TDDT</from>
+					<to>increasing_traditional_delivery_delay</to>
+				</connector>
+				<connector uid="47" angle="67.3801">
+					<from>Time_for_Delivery_Delay_Traditional_TDDT</from>
+					<to>decreasing_traditional_delivery_delay</to>
+				</connector>
+				<connector uid="48" angle="38.3675">
+					<from>Delivery_Delay_Taditional_DDT19</from>
+					<to>decreasing_traditional_delivery_delay</to>
+				</connector>
+				<connector uid="49" angle="48.3665">
+					<from>Delivery_Delay_Recognized_by_Company_DDRC13</from>
+					<to>increasing_traditional_delivery_delay</to>
+				</connector>
+				<connector uid="50" angle="77.4712">
+					<from>Delivery_Delay_Recognized_by_Company_DDRC13</from>
+					<to>Delivery_Delay_Condition_DDC21</to>
+				</connector>
+				<connector uid="51" angle="38.6598">
+					<from>Delivery_Delay_Taditional_DDT19</from>
+					<to>Delivery_Delay_Operating_Goal_DDOG20</to>
+				</connector>
+				<aux label_side="right" x="1455" y="293.5" name="Delivery Delay\nManagement Goal\nDDMG"/>
+				<connector uid="52" angle="180">
+					<from>Delivery_Delay_Management_Goal_DDMG</from>
+					<to>Delivery_Delay_Operating_Goal_DDOG20</to>
+				</connector>
+				<aux color="#008F00" font_color="#008F00" label_side="right" x="594" y="384" name="SW2"/>
+				<aux label_side="right" x="544.5" y="435" name="Sales Effectiveness\nfrom Delay SW\nSEDS"/>
+				<aux label_side="top" x="187.5" y="329" name="Sales Effectiveness\nfrom Delay\nMultiplier SEDM15"/>
+				<aux label_side="right" x="467" y="347" name="Sales Effectiveness\nfrom Delay CLIP\nSEDC16"/>
+				<aux label_side="top" x="354" y="219" name="Sales Effectiveness\nfrom Delay Initial\nSEDI"/>
+				<aux color="#008F00" font_color="#008F00" label_side="top" x="456" y="219" name="Sales Effectiveness\nfrom Delay Final\nSEDF"/>
+				<aux label_side="top" x="560" y="219" name="Sales Effectiveness\nfrom Delay Clip Time\nSEDCT"/>
+				<connector uid="53" angle="335.556">
+					<from>Sales_Effectiveness_from_Delay_Initial_SEDI</from>
+					<to>Sales_Effectiveness_from_Delay_CLIP_SEDC16</to>
+				</connector>
+				<connector uid="54" angle="274.912">
+					<from>Sales_Effectiveness_from_Delay_Final_SEDF</from>
+					<to>Sales_Effectiveness_from_Delay_CLIP_SEDC16</to>
+				</connector>
+				<connector uid="55" angle="212.005">
+					<from>Sales_Effectiveness_from_Delay_Clip_Time_SEDCT</from>
+					<to>Sales_Effectiveness_from_Delay_CLIP_SEDC16</to>
+				</connector>
+				<connector uid="56" angle="2.00955">
+					<from>Sales_Effectiveness_from_Delay_Multiplier_SEDM15</from>
+					<to>Sales_Effectiveness_from_Delay_SW_SEDS</to>
+				</connector>
+				<connector uid="57" angle="311.37">
+					<from>Sales_Effectiveness_from_Delay_CLIP_SEDC16</from>
+					<to>Sales_Effectiveness_from_Delay_SW_SEDS</to>
+				</connector>
+				<connector uid="58" angle="206.565">
+					<from>SW2</from>
+					<to>Sales_Effectiveness_from_Delay_SW_SEDS</to>
+				</connector>
+				<connector uid="59" angle="156.038">
+					<from>Delivery_Delay_Recognized_by_Market_DDRM14</from>
+					<to>Sales_Effectiveness_from_Delay_Multiplier_SEDM15</to>
+				</connector>
+				<aux label_side="right" x="621" y="483" name="Sales\nEffectiveness\nMaximum SEM"/>
+				<connector uid="60" angle="302.735">
+					<from>Sales_Effectiveness_from_Delay_SW_SEDS</from>
+					<to>Sales_Effectiveness_SE18</to>
+				</connector>
+				<connector uid="61" angle="180">
+					<from>Sales_Effectiveness_Maximum_SEM</from>
+					<to>Sales_Effectiveness_SE18</to>
+				</connector>
+				<connector uid="62" angle="331.928">
+					<from>Production_Capacity_Ordering_PCO24</from>
+					<to>Production_Capacity_Receiving_PCR25</to>
+				</connector>
+				<stacked_container uid="63" x="131.5" y="1133" width="610.5" height="435">
+					<graph width="610.5" height="435" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Figure 3 (scenario A) &amp; Figure 4 (scenario B)" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="false" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="Orders_Booked_OB3"/>
+							<scale min="0" max="24000"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="false" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Salesmen_S1"/>
+							<scale min="0" max="80"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="64" x="131.5" y="1596" width="610.5" height="435">
+					<graph width="610.5" height="435" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Figure 8 (scenario C)" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Orders_Booked_OB3"/>
+						</plot>
+						<plot color="blue" isee:keep_zero_visible="false" pen_width="1" index="1" show_y_axis="true">
+							<entity name="Delivery_Rate_DR10"/>
+							<scale min="0" max="24000"/>
+						</plot>
+						<plot color="fuchsia" pen_style="dotted" isee:keep_zero_visible="false" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="Backlog_BL7"/>
+							<scale min="0" max="120000"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="65" x="756.5" y="1133" width="610.5" height="435">
+					<graph width="610.5" height="435" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Figure 3 (scenario A) &amp; Figure 4 (scenario B) continued" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="false" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Backlog_BL7"/>
+							<scale min="0" max="120000"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="false" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="Sales_Effectiveness_SE18"/>
+							<scale min="0" max="400"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="66" x="756.5" y="1596" width="610.5" height="435">
+					<graph width="610.5" height="435" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Figure 8 (scenario C) continued" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="false" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Sales_Effectiveness_SE18"/>
+							<scale min="0" max="400"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="false" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="Delivery_Delay_Recognized_by_Market_DDRM14"/>
+							<scale min="2" max="6"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="67" x="131.5" y="2049" width="610.5" height="435">
+					<graph width="610.5" height="435" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Figure 9 (scenario D) &amp; Figure 10 (scenario E)" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="false" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Orders_Booked_OB3"/>
+							<scale min="0" max="24000"/>
+						</plot>
+						<plot color="blue" isee:keep_zero_visible="false" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="Delivery_Delay_Recognized_by_Market_DDRM14"/>
+							<scale min="2" max="6"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="68" x="756.5" y="2049" width="610.5" height="435">
+					<graph width="610.5" height="435" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Figure 9 (scenario D) &amp; Figure 10 (scenario E) continued" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="false" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Salesmen_S1"/>
+							<scale min="0" max="80"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="false" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="Salesmen_Hired_SH6"/>
+							<scale min="0" max="2"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="69" x="1388.5" y="2049" width="610.5" height="435">
+					<graph width="610.5" height="435" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Figure 9 (scenario D) &amp; Figure 10 (scenario E) continued" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="false" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Sales_Effectiveness_SE18"/>
+							<scale min="0" max="400"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="Production_Capacity_PC27"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="70" x="131.5" y="2506" width="610.5" height="435">
+					<graph width="610.5" height="435" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Figure 13 (scenario F) &amp; Figure 14 (scenario G)" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="false" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Orders_Booked_OB3"/>
+							<scale min="0" max="24000"/>
+						</plot>
+						<plot color="blue" isee:keep_zero_visible="false" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="Delivery_Delay_Recognized_by_Market_DDRM14"/>
+							<scale min="2" max="6"/>
+						</plot>
+						<plot color="fuchsia" pen_style="dotted" isee:keep_zero_visible="true" pen_width="1" index="1" right_axis="true" show_y_axis="true">
+							<entity name="Delivery_Delay_Operating_Goal_DDOG20"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="71" x="759.5" y="2506" width="610.5" height="435">
+					<graph width="610.5" height="435" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Figure 13 (scenario F) &amp; Figure 14 (scenario G) continued" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="false" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Salesmen_S1"/>
+							<scale min="0" max="80"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="false" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="Sales_Effectiveness_SE18"/>
+							<scale min="0" max="400"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="72" x="1388.5" y="2509" width="610.5" height="435">
+					<graph width="610.5" height="435" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" title="Figure 13 (scenario F) &amp; Figure 14 (scenario G) continued" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="false" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Production_Capacity_PC27"/>
+							<scale min="0" max="24000"/>
+						</plot>
+						<plot color="blue" isee:keep_zero_visible="false" pen_width="1" index="0" right_axis="true" show_y_axis="true">
+							<entity name="Capacity_Expansion_Fraction"/>
+							<scale min="-0.06" max="0.18"/>
+						</plot>
+					</graph>
+				</stacked_container>
+			</view>
+		</views>
+	</model>
+</xmile>
+
